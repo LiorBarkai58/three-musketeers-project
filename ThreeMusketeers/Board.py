@@ -45,7 +45,7 @@ class Tile(ButtonBehavior, Image):
     def on_press(self):
         self.source = "pics/5head.png"
         self.color
-        self.grid.graphicRepresentation[0][0].color = (50, 120, 10, 5)
+        self.grid.graphic_representation[0][0].color = (50, 120, 10, 5)
 
 
 position_dictionary = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4}
@@ -92,7 +92,7 @@ class Board(object):
                 else:
                     print
                     "invalid move"
-                    self.move_musk(raw_input())
+                    self.move_musk(input())
                     return
             if "d" in piece and "o" in piece and "w" in piece and "n" in piece:
                 if position_of_piece[0] != 4 and self.grid[position_of_piece[0] + 1][position_of_piece[1]] == "G":
@@ -101,7 +101,7 @@ class Board(object):
                 else:
                     print
                     "invalid move"
-                    self.move_musk(raw_input())
+                    self.move_musk(input())
                     return
             if "l" in piece and "e" in piece and "f" in piece and "t" in piece:
                 if position_of_piece[1] != 0 and self.grid[position_of_piece[0]][position_of_piece[1] - 1] == "G":
@@ -110,7 +110,7 @@ class Board(object):
                 else:
                     print
                     "invalid move"
-                    self.move_musk(raw_input())
+                    self.move_musk(input())
                     return
             if "r" in piece and "i" in piece and "g" in piece and "h" in piece and "t" in piece:
                 if position_of_piece[1] != 4 and self.grid[position_of_piece[0]][position_of_piece[1] + 1] == "G":
@@ -119,12 +119,12 @@ class Board(object):
                 else:
                     print
                     "invalid move"
-                    self.move_musk(raw_input())
+                    self.move_musk(input())
                     return
         else:
             print
             "invalid move"
-            self.move_musk(raw_input())
+            self.move_musk(input())
 
     def move_guard(self, piece):
         position_of_piece = [position_dictionary[piece[0]], eval(piece[1]) - 1]
@@ -136,7 +136,7 @@ class Board(object):
                 else:
                     print
                     "invalid move"
-                    self.move_guard(raw_input())
+                    self.move_guard(input())
                     return
             if "d" in piece and "o" in piece and "w" in piece and "n" in piece:
                 if position_of_piece[0] != 4 and self.grid[position_of_piece[0] + 1][position_of_piece[1]] == "-":
@@ -161,12 +161,12 @@ class Board(object):
                 else:
                     print
                     "invalid move"
-                    self.move_guard(raw_input())
+                    self.move_guard(input())
                     return
         else:
             print
             "invalid move"
-            self.move_guard(raw_input())
+            self.move_guard(input())
 
     def check_adjacent(self, row, col, direction):
         if direction == "left":

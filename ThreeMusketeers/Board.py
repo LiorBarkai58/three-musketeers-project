@@ -69,17 +69,13 @@ class Board(object):
 
     def print_board(self):
         counter = 0
-        print
-        "    1  2  3  4  5"
+        print("    1  2  3  4  5")
         for rows in self.grid:
-            print
-            letter_dictionary[counter] + "| ",
+            print (letter_dictionary[counter] + "| ", end=" ")
             for cols in rows:
-                print
-                cols + " ",
+                print(cols +  " ", end=" ")
             counter += 1
-            print
-            " \t"
+            print(" \t")
 
     def move_musk(self, piece):
         position_of_piece = [position_dictionary[piece[0]], eval(piece[1]) - 1]
@@ -99,8 +95,7 @@ class Board(object):
                     self.grid[position_of_piece[0]][position_of_piece[1]] = self.missing_piece
                     self.grid[position_of_piece[0] + 1][position_of_piece[1]] = "M"
                 else:
-                    print
-                    "invalid move"
+                    print("invalid move")
                     self.move_musk(input())
                     return
             if "l" in piece and "e" in piece and "f" in piece and "t" in piece:
@@ -108,8 +103,7 @@ class Board(object):
                     self.grid[position_of_piece[0]][position_of_piece[1]] = self.missing_piece
                     self.grid[position_of_piece[0]][position_of_piece[1] - 1] = "M"
                 else:
-                    print
-                    "invalid move"
+                    print("invalid move")
                     self.move_musk(input())
                     return
             if "r" in piece and "i" in piece and "g" in piece and "h" in piece and "t" in piece:
@@ -117,13 +111,11 @@ class Board(object):
                     self.grid[position_of_piece[0]][position_of_piece[1]] = self.missing_piece
                     self.grid[position_of_piece[0]][position_of_piece[1] + 1] = "M"
                 else:
-                    print
-                    "invalid move"
+                    print("invalid move")
                     self.move_musk(input())
                     return
         else:
-            print
-            "invalid move"
+            print("invalid move")
             self.move_musk(input())
 
     def move_guard(self, piece):
@@ -134,8 +126,7 @@ class Board(object):
                     self.grid[position_of_piece[0]][position_of_piece[1]] = self.missing_piece
                     self.grid[position_of_piece[0] - 1][position_of_piece[1]] = "G"
                 else:
-                    print
-                    "invalid move"
+                    print("invalid move")
                     self.move_guard(input())
                     return
             if "d" in piece and "o" in piece and "w" in piece and "n" in piece:
@@ -159,13 +150,11 @@ class Board(object):
                     self.grid[position_of_piece[0]][position_of_piece[1]] = self.missing_piece
                     self.grid[position_of_piece[0]][position_of_piece[1] + 1] = "G"
                 else:
-                    print
-                    "invalid move"
+                    print("invalid move")
                     self.move_guard(input())
                     return
         else:
-            print
-            "invalid move"
+            print("invalid move")
             self.move_guard(input())
 
     def check_adjacent(self, row, col, direction):

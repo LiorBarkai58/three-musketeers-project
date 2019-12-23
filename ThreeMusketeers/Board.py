@@ -20,6 +20,8 @@ class GraphicBoard(GridLayout):
         self.graphic_representation = []
         self.possible_moves = []
         self.moving = False
+        self.moveable_to = []
+        self.clicked_button = None
 
     def initialize_board(self):
         for row in range(5):
@@ -44,18 +46,31 @@ class Tile(ButtonBehavior, Image):
 
     def on_press(self):
         self.clicked = not self.clicked
-        if self.clicked:
-            for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
-                if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
-                    self.grid.graphic_representation[self.line + direction[0]][self.column + direction[1]].color = (
-                    50, 120, 10, 5)
+        if self.grid.moving and self in self.grid.moveable_to:
             self.source = "pics/5head.png"
+            if None != self.grid.clicked_button:
+                self.grid.clicked_button.source = "pics/kek2.png"
+            for button in self.grid.moveable_to:
+                button.color = (1, 1, 1 ,1)
+            self.grid.moveable_to = []
+
+
         else:
-            for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
-                if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
-                    self.grid.graphic_representation[self.line + direction[0]][self.column + direction[1]].color = (
-                    1, 1, 1, 1)
-            self.source = "pics/kekw.png"
+            if self.clicked:
+                self.grid.clicked_button = self
+                for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
+                    if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
+                        button_direction = self.grid.graphic_representation[self.line + direction[0]][
+                            self.column + direction[1]]
+                        button_direction.color = (50, 120, 10, 5)
+                        self.grid.moveable_to.append(button_direction)
+
+                self.grid.moving = True
+            else:
+                for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
+                    if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
+                        self.grid.graphic_representation[self.line + direction[0]][self.column + direction[1]].color = (
+                            1, 1, 1, 1)
 
 
 position_dictionary = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4}
@@ -76,6 +91,7 @@ class Board(object):
     missing_piece = "-"
     graphicGrid = GraphicBoard(grid)
     graphicGrid.initialize_board()
+
 
     def print_board(self):
         counter = 0

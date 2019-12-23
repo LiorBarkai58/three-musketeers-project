@@ -43,9 +43,19 @@ class Tile(ButtonBehavior, Image):
         self.source = "pics/kekw.png"
 
     def on_press(self):
-        self.source = "pics/5head.png"
-        self.color
-        self.grid.graphic_representation[0][0].color = (50, 120, 10, 5)
+        self.clicked = not self.clicked
+        if self.clicked:
+            for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
+                if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
+                    self.grid.graphic_representation[self.line + direction[0]][self.column + direction[1]].color = (
+                    50, 120, 10, 5)
+            self.source = "pics/5head.png"
+        else:
+            for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
+                if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
+                    self.grid.graphic_representation[self.line + direction[0]][self.column + direction[1]].color = (
+                    1, 1, 1, 1)
+            self.source = "pics/kekw.png"
 
 
 position_dictionary = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4}
@@ -71,9 +81,9 @@ class Board(object):
         counter = 0
         print("    1  2  3  4  5")
         for rows in self.grid:
-            print (letter_dictionary[counter] + "| ", end=" ")
+            print(letter_dictionary[counter] + "| ", end=" ")
             for cols in rows:
-                print(cols +  " ", end=" ")
+                print(cols + " ", end=" ")
             counter += 1
             print(" \t")
 

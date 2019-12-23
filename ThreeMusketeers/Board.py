@@ -53,9 +53,11 @@ class Tile(ButtonBehavior, Image):
             for button in self.grid.moveable_to:
                 button.color = (1, 1, 1 ,1)
             self.grid.moveable_to = []
+            self.grid.clicked_button = None
+            self.grid.moving = False
 
 
-        else:
+        elif not self.grid.moving:
             if self.clicked:
                 self.grid.clicked_button = self
                 for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):

@@ -1,13 +1,16 @@
 from kivy.app import App
 
-from ThreeMusketeers.Board import Board
+from ThreeMusketeers.Board import Board, GraphicBoard
 
 board = Board()
+graphicGrid = GraphicBoard(board)
+graphicGrid.initialize_board()
+
 
 class TestApp(App):
     def build(self):
         self.title = 'ThreeMusketeers'
-        return board.graphicGrid
+        return graphicGrid
 
 
 TestApp().run()

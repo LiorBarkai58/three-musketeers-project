@@ -91,8 +91,6 @@ class Board(object):
     winning_piece = "-"
 
     missing_piece = "-"
-    graphicGrid = GraphicBoard(grid)
-    graphicGrid.initialize_board()
 
 
     def print_board(self):

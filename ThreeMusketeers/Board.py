@@ -34,9 +34,9 @@ class GraphicBoard(GridLayout):
 
 
 class Tile(ButtonBehavior, Image):
-    def __init__(self, line, column, grid, **kwargs):
+    def __init__(self, line, column, graphic_board, **kwargs):
         self.clicked = False
-        self.grid = grid
+        self.graphic_board = graphic_board
         ButtonBehavior.__init__(self, **kwargs)
         self.line = line
         self.column = column

@@ -58,28 +58,52 @@ class Tile(ButtonBehavior, Image):
             if None != self.graphic_board.clicked_button:
                 self.graphic_board.clicked_button.source = "pics/kappa.png"
                 self.graphic_board.clicked_button.type = types_dictionary["empty"]
-                button.color = (1, 1, 1 ,1)
-            self.grid.moveable_to = []
-            self.grid.clicked_button = None
-            self.grid.moving = False
-
-
-        elif not self.grid.moving:
-            if self.clicked:
-                self.grid.clicked_button = self
-                for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
-                    if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
-                        button_direction = self.grid.graphic_representation[self.line + direction[0]][
-                            self.column + direction[1]]
-                        button_direction.color = (50, 120, 10, 5)
-                        self.grid.moveable_to.append(button_direction)
-
-                self.grid.moving = True
+            for button in self.graphic_board.moveable_to:
+                button.color = (1, 1, 1, 1)
+            self.graphic_board.moveable_to = []
+            current_button = self.graphic_board.clicked_button
+            if self.graphic_board.board.turn_counter % 2 != 0:
+                self.graphic_board.board.grid[current_button.line][current_button.column] = "-"
+                self.graphic_board.board.grid[self.line][self.column] = "M"
+                self.graphic_board.board.turn_counter += 1
+                self.graphic_board.board.guard_win_check()
+                self.graphic_board.board.musketeer_win_check()
+                self.graphic_board.board.print_board()
             else:
-                for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
-                    if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
-                        self.grid.graphic_representation[self.line + direction[0]][self.column + direction[1]].color = (
-                            1, 1, 1, 1)
+                self.graphic_board.board.grid[current_button.line][current_button.column] = "-"
+                self.graphic_board.board.grid[self.line][self.column] = "G"
+                self.graphic_board.board.turn_counter += 1
+                self.graphic_board.board.guard_win_check()
+                self.graphic_board.board.musketeer_win_check()
+                self.graphic_board.board.print_board()
+
+            self.graphic_board.clicked_button = None
+            self.graphic_board.moving = False
+
+
+        elif not self.graphic_board.moving and not self.type == types_dictionary["empty"]:
+            if (self.graphic_board.board.turn_counter % 2 == 0 and self.type == types_dictionary["guard"]) \
+                    or (1 == self.graphic_board.board.turn_counter % 2 and self.type == types_dictionary["musketeer"]):
+                self.clicked = not self.clicked
+
+                if self.clicked:
+                    self.graphic_board.clicked_button = self
+                    for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
+                        if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
+                            button_direction = self.graphic_board.graphic_representation[self.line + direction[0]][
+                                self.column + direction[1]]
+                            if (button_direction.type == types_dictionary["guard"] and self.type == types_dictionary["musketeer"]) \
+                                    or (button_direction.type == types_dictionary["empty"] and self.type == types_dictionary["guard"]):
+                                button_direction.color = (50, 120, 10, 5)
+                                self.graphic_board.moveable_to.append(button_direction)
+
+                    self.graphic_board.moving = True
+                else:
+                    for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
+                        if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
+                            self.graphic_board.graphic_representation[self.line + direction[0]][
+                                self.column + direction[1]].color = (
+                                1, 1, 1, 1)
 
 
 position_dictionary = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4}

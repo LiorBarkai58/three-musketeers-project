@@ -123,6 +123,7 @@ class Board(object):
 
     missing_piece = "-"
 
+    turn_counter = 1
 
     def print_board(self):
         counter = 0

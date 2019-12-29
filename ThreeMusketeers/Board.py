@@ -51,12 +51,13 @@ class Tile(ButtonBehavior, Image):
             self.type = types_dictionary["guard"]
 
     def on_press(self):
+        if self.graphic_board.moving and self in self.graphic_board.moveable_to:
         self.clicked = not self.clicked
-        if self.grid.moving and self in self.grid.moveable_to:
-            self.source = "pics/5head.png"
-            if None != self.grid.clicked_button:
-                self.grid.clicked_button.source = "pics/kek2.png"
-            for button in self.grid.moveable_to:
+            self.source = self.graphic_board.clicked_button.source
+            self.type = self.graphic_board.clicked_button.type
+            if None != self.graphic_board.clicked_button:
+                self.graphic_board.clicked_button.source = "pics/kappa.png"
+                self.graphic_board.clicked_button.type = types_dictionary["empty"]
                 button.color = (1, 1, 1 ,1)
             self.grid.moveable_to = []
             self.grid.clicked_button = None

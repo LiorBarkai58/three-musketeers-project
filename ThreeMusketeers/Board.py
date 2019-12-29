@@ -11,9 +11,9 @@ types_dictionary = {"musketeer": "M", "guard": "G", "empty": "-"}
 
 
 class GraphicBoard(GridLayout):
-    def __init__(self, grid, **kwargs):
+    def __init__(self, board, **kwargs):
         GridLayout.__init__(self, **kwargs)
-        self.grid = grid
+        self.board = board
         self.cols = 5
         self.rows = 5
         self.turn_counter = 1

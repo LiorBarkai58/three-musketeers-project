@@ -42,7 +42,13 @@ class Tile(ButtonBehavior, Image):
         self.column = column
         self.type = types_dictionary["empty"]
         Image.__init__(self, **kwargs)
+        if (self.line == 4 and self.column == 0) or (self.line == 2 and self.column == 2) or (
+                self.line == 0 and self.column == 4):
+            self.source = "pics/5head.png"
+            self.type = types_dictionary["musketeer"]
+        else:
         self.source = "pics/kekw.png"
+            self.type = types_dictionary["guard"]
 
     def on_press(self):
         self.clicked = not self.clicked

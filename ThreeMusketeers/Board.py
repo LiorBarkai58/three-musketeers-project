@@ -47,12 +47,12 @@ class Tile(ButtonBehavior, Image):
             self.source = "pics/5head.png"
             self.type = types_dictionary["musketeer"]
         else:
-        self.source = "pics/kekw.png"
+            self.source = "pics/kekw.png"
             self.type = types_dictionary["guard"]
 
     def on_press(self):
         if self.graphic_board.moving and self in self.graphic_board.moveable_to:
-        self.clicked = not self.clicked
+            self.clicked = not self.clicked
             self.source = self.graphic_board.clicked_button.source
             self.type = self.graphic_board.clicked_button.type
             if None != self.graphic_board.clicked_button:
@@ -254,8 +254,9 @@ class Board(object):
                 if self.grid[rows][cols] == "M":
                     if not self.has_legal_moves(rows, cols):
                         free_counter += 1
-        self.game_over = True
-        self.winning_piece = "M"
+        if free_counter == 3:
+            self.game_over = True
+            self.winning_piece = "M"
 
     def guard_win_check(self):
         for rows in self.grid:

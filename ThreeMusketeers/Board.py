@@ -239,7 +239,7 @@ class Board(object):
                 return self.grid[row - 1][col]
 
     def has_legal_moves(self, piece_row, piece_col):
-        piece = self.grid
+        piece = self.grid[piece_row][piece_col]
         if piece == "M":
             desired_game_piece = 'G'
         else:

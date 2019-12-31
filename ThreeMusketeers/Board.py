@@ -231,12 +231,12 @@ class Board(object):
             if row == 0:
                 return "-"
             else:
-                return self.grid[row + 1][col]
+                return self.grid[row - 1][col]
         if direction == "down":
             if row == len(self.grid) - 1:
                 return "-"
             else:
-                return self.grid[row - 1][col]
+                return self.grid[row + 1][col]
 
     def has_legal_moves(self, piece_row, piece_col):
         piece = self.grid[piece_row][piece_col]

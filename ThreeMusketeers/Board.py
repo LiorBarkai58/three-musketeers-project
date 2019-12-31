@@ -8,6 +8,7 @@ Config.set("graphics", "width", 800)
 Config.set("graphics", "height", 800)
 
 types_dictionary = {"musketeer": "M", "guard": "G", "empty": "-"}
+pictures_dictionary = {"M" : "pics/5head.png", "G" : "pics/kekw.png", "-" : "pics/kappa.png"}
 
 
 class GraphicBoard(GridLayout):

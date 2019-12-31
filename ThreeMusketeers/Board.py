@@ -259,7 +259,12 @@ class Board(object):
             self.winning_piece = "M"
 
     def guard_win_check(self):
-        for rows in self.grid:
-            if rows.count("M") == 3:
+        musketeers = []
+        if not self.game_over:
+            for rows in range(len(self.grid)):
+                for cols in range(len(self.grid[rows])):
+                    if self.grid[rows][cols] == "M":
+                        musketeers.append([rows, cols])
+            if (musketeers[0][1] == musketeers[1][1] == musketeers[2][1]) or (musketeers[0][0] == musketeers[1][0] == musketeers[2][0]):
                 self.game_over = True
                 self.winning_piece = "G"

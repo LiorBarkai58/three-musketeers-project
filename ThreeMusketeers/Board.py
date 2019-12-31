@@ -1,6 +1,8 @@
 import kivy
 from kivy.config import Config
+from kivy.core.text import Label
 from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
 
@@ -34,6 +36,15 @@ class GraphicBoard(GridLayout):
                 self.add_widget(button)
             self.graphic_representation.append(current_list)
 
+    def end_game_text(self):
+        self.game_over_text = Button(text= "Game over")
+        self.game_over_text.size = [600, 100]
+        self.game_over_text.x = 100
+        self.game_over_text.y = 350
+        self.game_over_text.font_size = 70
+        self.game_over_text.color = (1, 125, 250, 1)
+        self.add_widget(self.game_over_text)
+
 
 class Tile(ButtonBehavior, Image):
     def __init__(self, line, column, graphic_board, **kwargs):
@@ -53,7 +64,11 @@ class Tile(ButtonBehavior, Image):
             self.type = types_dictionary["guard"]
 
     def on_press(self):
-        if self.graphic_board.moving and self in self.graphic_board.moveable_to:
+        self.graphic_board.board.guard_win_check()
+        self.graphic_board.board.musketeer_win_check()
+        if self.graphic_board.board.game_over:
+            self.graphic_board.end_game_text()
+        elif self.graphic_board.moving and self in self.graphic_board.moveable_to:
             self.clicked = not self.clicked
             self.source = self.graphic_board.clicked_button.source
             self.type = self.graphic_board.clicked_button.type

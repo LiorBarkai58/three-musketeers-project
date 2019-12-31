@@ -22,6 +22,7 @@ class GraphicBoard(GridLayout):
         self.moving = False
         self.moveable_to = []
         self.clicked_button = None
+        self.game_over_text = None
 
     def initialize_board(self):
         for row in range(5):
@@ -42,8 +43,8 @@ class Tile(ButtonBehavior, Image):
         self.column = column
         self.type = types_dictionary["empty"]
         Image.__init__(self, **kwargs)
-        if (self.line == 4 and self.column == 0) or (self.line == 2 and self.column == 2) or (
-                self.line == 0 and self.column == 4):
+        self.type = self.graphic_board.board.grid[self.line][self.column]
+        self.source = pictures_dictionary[self.type]
             self.source = "pics/5head.png"
             self.type = types_dictionary["musketeer"]
         else:

@@ -70,6 +70,7 @@ class Tile(ButtonBehavior, Image):
                 self.graphic_board.board.guard_win_check()
                 self.graphic_board.board.musketeer_win_check()
                 self.graphic_board.board.print_board()
+                self.graphic_board.clicked_button.clicked = False
             else:
                 self.graphic_board.board.grid[current_button.line][current_button.column] = "-"
                 self.graphic_board.board.grid[self.line][self.column] = "G"
@@ -77,6 +78,8 @@ class Tile(ButtonBehavior, Image):
                 self.graphic_board.board.guard_win_check()
                 self.graphic_board.board.musketeer_win_check()
                 self.graphic_board.board.print_board()
+                self.graphic_board.clicked_button.clicked = False
+
 
             self.graphic_board.clicked_button = None
             self.graphic_board.moving = False

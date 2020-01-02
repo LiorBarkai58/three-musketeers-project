@@ -62,6 +62,21 @@ class Tile(ButtonBehavior, Image):
         self.type = self.graphic_board.board.grid[self.line][self.column]
         self.source = pictures_dictionary[self.type]
 
+    def highlight_movement_options(self):
+        for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
+            if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
+                button_direction = self.graphic_board.graphic_representation[self.line + direction[0]][
+                    self.column + direction[1]]
+                if (button_direction.type == types_dictionary["guard"] and self.type == types_dictionary["musketeer"]) \
+                        or (
+                        button_direction.type == types_dictionary["empty"] and self.type == types_dictionary["guard"]):
+                    button_direction.color = (50, 120, 10, 5)
+                    self.graphic_board.moveable_to.append(button_direction)
+
+    def dehighlight_movement_options(self):
+        for button in self.graphic_board.moveable_to:
+            button.color = (1, 1, 1, 1)
+
     def on_press(self):
         self.graphic_board.board.guard_win_check()
         self.graphic_board.board.musketeer_win_check()

@@ -10,7 +10,7 @@ Config.set("graphics", "width", 800)
 Config.set("graphics", "height", 800)
 
 types_dictionary = {"musketeer": "M", "guard": "G", "empty": "-"}
-pictures_dictionary = {"M" : "pics/5head.png", "G" : "pics/kekw.png", "-" : "pics/kappa.png"}
+pictures_dictionary = {"M": "pics/5head.png", "G": "pics/kekw.png", "-": "pics/kappa.png"}
 
 
 class GraphicBoard(GridLayout):
@@ -37,13 +37,17 @@ class GraphicBoard(GridLayout):
             self.graphic_representation.append(current_list)
 
     def end_game_text(self):
-        self.game_over_text = Button(text= "Game over")
+        self.game_over_text = Button(text="Game over")
         self.game_over_text.size = [600, 100]
         self.game_over_text.x = 100
         self.game_over_text.y = 350
         self.game_over_text.font_size = 70
         self.game_over_text.color = (1, 125, 250, 1)
         self.add_widget(self.game_over_text)
+
+    def general_win_check(self):
+        self.board.guard_win_check()
+        self.board.musketeer_win_check()
 
 
 class Tile(ButtonBehavior, Image):

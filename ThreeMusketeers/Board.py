@@ -61,11 +61,6 @@ class Tile(ButtonBehavior, Image):
         Image.__init__(self, **kwargs)
         self.type = self.graphic_board.board.grid[self.line][self.column]
         self.source = pictures_dictionary[self.type]
-            self.source = "pics/5head.png"
-            self.type = types_dictionary["musketeer"]
-        else:
-            self.source = "pics/kekw.png"
-            self.type = types_dictionary["guard"]
 
     def on_press(self):
         self.graphic_board.board.guard_win_check()

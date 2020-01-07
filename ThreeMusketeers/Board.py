@@ -240,23 +240,23 @@ class Board(object):
     def check_adjacent(self, row, col, direction):
         if direction == "left":
             if col == 0:
-                return "-"
+                return "none"
             else:
                 return self.grid[row][col - 1]
 
         if direction == "right":
             if col == len(self.grid[row]) - 1:
-                return "-"
+                return "none"
             else:
                 return self.grid[row][col + 1]
         if direction == "up":
             if row == 0:
-                return "-"
+                return "none"
             else:
                 return self.grid[row - 1][col]
         if direction == "down":
             if row == len(self.grid) - 1:
-                return "-"
+                return "none"
             else:
                 return self.grid[row + 1][col]
 

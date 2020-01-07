@@ -1,3 +1,5 @@
+import math
+import random as rnd
 import kivy
 from kivy.config import Config
 from kivy.core.text import Label
@@ -26,6 +28,7 @@ class GraphicBoard(GridLayout):
         self.moveable_to = []
         self.clicked_button = None
         self.game_over_text = None
+        self.random = "G"
 
     def initialize_board(self):
         for row in range(5):
@@ -35,6 +38,8 @@ class GraphicBoard(GridLayout):
                 current_list.append(button)
                 self.add_widget(button)
             self.graphic_representation.append(current_list)
+        if self.random == "M":
+            self.musketeer_random_turn()
 
     def end_game_text(self):
         self.game_over_text = Button(text="Game over")
@@ -48,6 +53,33 @@ class GraphicBoard(GridLayout):
     def general_win_check(self):
         self.board.guard_win_check()
         self.board.musketeer_win_check()
+
+    def musketeer_random_turn(self):
+        row = rnd.randint(0, 4)
+        col = rnd.randint(0, 4)
+        while not self.board.grid[row][col] == "M" or not self.board.has_legal_moves(row, col):
+            row = rnd.randint(0, 4)
+            col = rnd.randint(0, 4)
+        self.graphic_representation[row][col].on_press()
+        if len(self.moveable_to) > 0:
+            index = rnd.randint(0, len(self.moveable_to)-1)
+            self.moveable_to[index].on_press()
+
+
+    def guard_random_turn(self):
+        random_row = rnd.randint(0, 4)
+        random_col = rnd.randint(0, 4)
+        while (not self.board.grid[random_row][random_col] == "G") or (self.board.grid[random_row][random_col] == "G" and not self.board.has_legal_moves(random_row, random_col)):
+            random_row = rnd.randint(0, 4)
+            random_col = rnd.randint(0, 4)
+
+        self.graphic_representation[random_row][random_col].on_press()
+        if len(self.moveable_to) > 0:
+            index = rnd.randint(0, len(self.moveable_to)-1)
+            self.moveable_to[index].on_press()
+
+
+
 
 
 class Tile(ButtonBehavior, Image):
@@ -82,12 +114,15 @@ class Tile(ButtonBehavior, Image):
 
 
 
+
     def on_press(self):
+        if self.graphic_board.board.game_over:
+            self.graphic_board.end_game_text()
+            return
         if self.graphic_board.moving and self == self.graphic_board.clicked_button and self.clicked:
             self.dehighlight_movement_options()
             self.graphic_board.moving = False
-        if self.graphic_board.board.game_over:
-            self.graphic_board.end_game_text()
+
         elif self.graphic_board.moving and self in self.graphic_board.moveable_to:
             self.source = self.graphic_board.clicked_button.source
             self.type = self.graphic_board.clicked_button.type
@@ -113,6 +148,7 @@ class Tile(ButtonBehavior, Image):
             self.graphic_board.moving = False
 
 
+
         elif not self.graphic_board.moving and not self.type == types_dictionary["empty"]:
             if (self.graphic_board.board.turn_counter % 2 == 0 and self.type == types_dictionary["guard"]) \
                     or (1 == self.graphic_board.board.turn_counter % 2 and self.type == types_dictionary["musketeer"]):
@@ -126,6 +162,11 @@ class Tile(ButtonBehavior, Image):
                 else:
                     self.dehighlight_movement_options()
         self.graphic_board.general_win_check()
+        if self.graphic_board.random == "M" and self.graphic_board.board.turn_counter % 2 == 1 and not self.graphic_board.moving:
+            self.graphic_board.musketeer_random_turn()
+        elif self.graphic_board.random == "G" and self.graphic_board.board.turn_counter %2 == 0 and not self.graphic_board.moving:
+            self.graphic_board.guard_random_turn()
+
 
 
 position_dictionary = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4}
@@ -274,12 +315,12 @@ class Board(object):
             free_counter = 0
             for rows in range(len(self.grid)):
                 for cols in range(len(self.grid[rows])):
-                if self.grid[rows][cols] == "M":
-                    if not self.has_legal_moves(rows, cols):
-                        free_counter += 1
-        if free_counter == 3:
-            self.game_over = True
-            self.winning_piece = "M"
+                    if self.grid[rows][cols] == "M":
+                        if not self.has_legal_moves(rows, cols):
+                            free_counter += 1
+            if free_counter == 3:
+                self.game_over = True
+                self.winning_piece = "M"
 
     def guard_win_check(self):
         musketeers = []

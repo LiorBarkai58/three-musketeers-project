@@ -270,9 +270,10 @@ class Board(object):
                    ("up", "down", "left", "right"))
 
     def musketeer_win_check(self):
-        free_counter = 0
-        for rows in range(len(self.grid)):
-            for cols in range(len(self.grid[rows])):
+        if not self.game_over:
+            free_counter = 0
+            for rows in range(len(self.grid)):
+                for cols in range(len(self.grid[rows])):
                 if self.grid[rows][cols] == "M":
                     if not self.has_legal_moves(rows, cols):
                         free_counter += 1

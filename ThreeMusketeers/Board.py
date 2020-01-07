@@ -64,6 +64,7 @@ class Tile(ButtonBehavior, Image):
 
     def get_type(self):
         return self.type
+
     def highlight_movement_options(self):
         for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
             if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
@@ -79,13 +80,15 @@ class Tile(ButtonBehavior, Image):
         for button in self.graphic_board.moveable_to:
             button.color = (1, 1, 1, 1)
 
+
+
     def on_press(self):
-        self.graphic_board.board.guard_win_check()
-        self.graphic_board.board.musketeer_win_check()
+        if self.graphic_board.moving and self == self.graphic_board.clicked_button and self.clicked:
+            self.dehighlight_movement_options()
+            self.graphic_board.moving = False
         if self.graphic_board.board.game_over:
             self.graphic_board.end_game_text()
         elif self.graphic_board.moving and self in self.graphic_board.moveable_to:
-            self.clicked = not self.clicked
             self.source = self.graphic_board.clicked_button.source
             self.type = self.graphic_board.clicked_button.type
             if None != self.graphic_board.clicked_button:
@@ -98,21 +101,14 @@ class Tile(ButtonBehavior, Image):
             if self.graphic_board.board.turn_counter % 2 != 0:
                 self.graphic_board.board.grid[current_button.line][current_button.column] = "-"
                 self.graphic_board.board.grid[self.line][self.column] = "M"
-                self.graphic_board.board.turn_counter += 1
-                self.graphic_board.board.guard_win_check()
-                self.graphic_board.board.musketeer_win_check()
-                self.graphic_board.board.print_board()
-                self.graphic_board.clicked_button.clicked = False
             else:
                 self.graphic_board.board.grid[current_button.line][current_button.column] = "-"
                 self.graphic_board.board.grid[self.line][self.column] = "G"
-                self.graphic_board.board.turn_counter += 1
-                self.graphic_board.board.guard_win_check()
-                self.graphic_board.board.musketeer_win_check()
-                self.graphic_board.board.print_board()
-                self.graphic_board.clicked_button.clicked = False
-
-
+            self.graphic_board.board.turn_counter += 1
+            self.graphic_board.board.guard_win_check()
+            self.graphic_board.board.musketeer_win_check()
+            self.graphic_board.board.print_board()
+            self.graphic_board.clicked_button.clicked = False
             self.graphic_board.clicked_button = None
             self.graphic_board.moving = False
 
@@ -124,22 +120,12 @@ class Tile(ButtonBehavior, Image):
 
                 if self.clicked:
                     self.graphic_board.clicked_button = self
-                    for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
-                        if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
-                            button_direction = self.graphic_board.graphic_representation[self.line + direction[0]][
-                                self.column + direction[1]]
-                            if (button_direction.type == types_dictionary["guard"] and self.type == types_dictionary["musketeer"]) \
-                                    or (button_direction.type == types_dictionary["empty"] and self.type == types_dictionary["guard"]):
-                                button_direction.color = (50, 120, 10, 5)
-                                self.graphic_board.moveable_to.append(button_direction)
+                    self.highlight_movement_options()
 
                     self.graphic_board.moving = True
                 else:
-                    for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
-                        if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
-                            self.graphic_board.graphic_representation[self.line + direction[0]][
-                                self.column + direction[1]].color = (
-                                1, 1, 1, 1)
+                    self.dehighlight_movement_options()
+        self.graphic_board.general_win_check()
 
 
 position_dictionary = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4}
@@ -301,6 +287,7 @@ class Board(object):
                 for cols in range(len(self.grid[rows])):
                     if self.grid[rows][cols] == "M":
                         musketeers.append([rows, cols])
-            if (musketeers[0][1] == musketeers[1][1] == musketeers[2][1]) or (musketeers[0][0] == musketeers[1][0] == musketeers[2][0]):
+            if (musketeers[0][1] == musketeers[1][1] == musketeers[2][1]) or (
+                    musketeers[0][0] == musketeers[1][0] == musketeers[2][0]):
                 self.game_over = True
                 self.winning_piece = "G"

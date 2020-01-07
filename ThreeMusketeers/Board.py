@@ -62,6 +62,8 @@ class Tile(ButtonBehavior, Image):
         self.type = self.graphic_board.board.grid[self.line][self.column]
         self.source = pictures_dictionary[self.type]
 
+    def get_type(self):
+        return self.type
     def highlight_movement_options(self):
         for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
             if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:

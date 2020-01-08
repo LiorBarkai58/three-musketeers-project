@@ -11,26 +11,31 @@ from kivy.uix.image import Image
 Config.set("graphics", "width", 800)
 Config.set("graphics", "height", 800)
 
+# simplifies the use of the different game pieces
 types_dictionary = {"musketeer": "M", "guard": "G", "empty": "-"}
-pictures_dictionary = {"M": "pics/5head.png", "G": "pics/kekw.png", "-": "pics/kappa.png"}
+reverse_types_dictionary = {"M" : "musketeers", "G" : "guards"}
+# connects each image to a type of game piece
 pictures_dictionary = {"M": "pics/musketeer.png", "G": "pics/guard.png", "-": "pics/empty.png"}
 
 
+# Graphic board constructor
 class GraphicBoard(GridLayout):
     def __init__(self, board, **kwargs):
         GridLayout.__init__(self, **kwargs)
-        self.board = board
-        self.cols = 5
-        self.rows = 5
-        self.turn_counter = 1
-        self.graphic_representation = []
-        self.possible_moves = []
-        self.moving = False
-        self.moveable_to = []
-        self.clicked_button = None
-        self.game_over_text = None
-        self.random = "G"
+        self.board = board  # The game board
+        self.cols = 5  # The size of one dimension of the board
+        self.rows = self.cols
+        self.graphic_representation = []  # A matrix that holds all of the buttons
+        self.moving = False  # An indication boolean which is true when buttons are highlighted and a piece is chosen and is ready to move
+        self.moveable_to = []  # A list that holds all of the buttons that a chosen game piece can move to
+        self.clicked_button = None  # A variable that holds the currently clicked button
+        self.game_over_text = None  # A text that shows up when the game is over
+        self.random = "G"  # G for the guards to be the random player and M for the musketeers to be the random player
 
+    #
+    # Creates the graphic board, adds the buttons into a matrix and if a random player is meant to be the musketeers
+    # the first turn will commence
+    #
     def initialize_board(self):
         for row in range(5):
             current_list = []
@@ -42,19 +47,28 @@ class GraphicBoard(GridLayout):
         if self.random == "M":
             self.musketeer_random_turn()
 
+    #
+    # Creates and displays the text once the game is over
+    #
     def end_game_text(self):
-        self.game_over_text = Button(text="Game over")
-        self.game_over_text.size = [600, 100]
-        self.game_over_text.x = 100
+        self.game_over_text = Button(text="Game over \n the %s \n have won" % reverse_types_dictionary[self.board.winning_piece])
+        self.game_over_text.size = [600, 300]
+        self.game_over_text.x = 50
         self.game_over_text.y = 350
         self.game_over_text.font_size = 70
         self.game_over_text.color = (1, 125, 250, 1)
         self.add_widget(self.game_over_text)
 
+    #
+    # Checks if the game has ended
+    #
     def general_win_check(self):
         self.board.guard_win_check()
         self.board.musketeer_win_check()
 
+    #
+    # Plays a random turn as the musketeers
+    #
     def musketeer_random_turn(self):
         row = rnd.randint(0, 4)
         col = rnd.randint(0, 4)
@@ -63,39 +77,42 @@ class GraphicBoard(GridLayout):
             col = rnd.randint(0, 4)
         self.graphic_representation[row][col].on_press()
         if len(self.moveable_to) > 0:
-            index = rnd.randint(0, len(self.moveable_to)-1)
+            index = rnd.randint(0, len(self.moveable_to) - 1)
             self.moveable_to[index].on_press()
 
-
+    #
+    # Plays a random turn as the guards
+    #
     def guard_random_turn(self):
         random_row = rnd.randint(0, 4)
         random_col = rnd.randint(0, 4)
-        while (not self.board.grid[random_row][random_col] == "G") or (self.board.grid[random_row][random_col] == "G" and not self.board.has_legal_moves(random_row, random_col)):
+        while (not self.board.grid[random_row][random_col] == "G") or (
+                self.board.grid[random_row][random_col] == "G" and not self.board.has_legal_moves(random_row,
+                                                                                                  random_col)):
             random_row = rnd.randint(0, 4)
             random_col = rnd.randint(0, 4)
 
         self.graphic_representation[random_row][random_col].on_press()
         if len(self.moveable_to) > 0:
-            index = rnd.randint(0, len(self.moveable_to)-1)
+            index = rnd.randint(0, len(self.moveable_to) - 1)
             self.moveable_to[index].on_press()
-
-
-
 
 
 class Tile(ButtonBehavior, Image):
     def __init__(self, line, column, graphic_board, **kwargs):
-        self.clicked = False
-        self.graphic_board = graphic_board
+        self.clicked = False  # A boolean to indicate if the button is clicked or not
+        self.graphic_board = graphic_board  # The button's graphic board
         ButtonBehavior.__init__(self, **kwargs)
-        self.line = line
-        self.column = column
-        self.type = types_dictionary["empty"]
+        self.line = line  # The button's line in the graphic board
+        self.column = column  # The button's column in the graphic board
+        self.type = types_dictionary["empty"]  # The game piece's type
         Image.__init__(self, **kwargs)
         self.type = self.graphic_board.board.grid[self.line][self.column]
-        self.source = pictures_dictionary[self.type]
+        self.source = pictures_dictionary[self.type]  # The type's image
 
-
+    #
+    # Highlights all of the buttons the chosen button can move to
+    #
     def highlight_movement_options(self):
         for direction in ([1, 0], [-1, 0], [0, 1], [0, -1]):
             if 0 <= self.line + direction[0] < 5 and 0 <= self.column + direction[1] < 5:
@@ -110,22 +127,27 @@ class Tile(ButtonBehavior, Image):
                         button_direction.source = "pics/highlighted_empty.png"
                     self.graphic_board.moveable_to.append(button_direction)
 
+    #
+    # Dehighlights all of the buttons that the chosen button was able to move to before
+    #
     def dehighlight_movement_options(self):
         for button in self.graphic_board.moveable_to:
 
-            if self.graphic_board.board.turn_counter % 2 == 1:
+            if self.graphic_board.board.turn_counter % 2 == 1 and not button == self:
                 button.source = "pics/guard.png"
-            elif not self:
+            elif not button == self:
                 button.source = "pics/empty.png"
 
     def on_press(self):
-        if self.graphic_board.board.game_over:
+        if self.graphic_board.board.game_over:  # Incase the game has ended it will display a text on screen
             self.graphic_board.end_game_text()
+
             return
+        # If a button is reclicked, dehighlight it
         if self.graphic_board.moving and self == self.graphic_board.clicked_button and self.clicked:
             self.dehighlight_movement_options()
             self.graphic_board.moving = False
-
+        # Moves the button to the chosen button if it can be moved to it
         elif self.graphic_board.moving and self in self.graphic_board.moveable_to:
             self.source = self.graphic_board.clicked_button.source
             self.type = self.graphic_board.clicked_button.type
@@ -151,7 +173,7 @@ class Tile(ButtonBehavior, Image):
             self.graphic_board.moving = False
 
 
-
+        # Highlights the buttons the game piece can move to or dehighlights the ones chosen if already clicked
         elif not self.graphic_board.moving and not self.type == types_dictionary["empty"]:
             if (self.graphic_board.board.turn_counter % 2 == 0 and self.type == types_dictionary["guard"]) \
                     or (1 == self.graphic_board.board.turn_counter % 2 and self.type == types_dictionary["musketeer"]):
@@ -167,9 +189,8 @@ class Tile(ButtonBehavior, Image):
         self.graphic_board.general_win_check()
         if self.graphic_board.random == "M" and self.graphic_board.board.turn_counter % 2 == 1 and not self.graphic_board.moving:
             self.graphic_board.musketeer_random_turn()
-        elif self.graphic_board.random == "G" and self.graphic_board.board.turn_counter %2 == 0 and not self.graphic_board.moving:
+        elif self.graphic_board.random == "G" and self.graphic_board.board.turn_counter % 2 == 0 and not self.graphic_board.moving:
             self.graphic_board.guard_random_turn()
-
 
 
 position_dictionary = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4}
@@ -177,20 +198,30 @@ letter_dictionary = {0: "A", 1: "B", 2: "C", 3: "D", 4: "E"}
 
 
 class Board(object):
+    # A grid to display the board
     grid = [["G", "G", "G", "G", "M"],
             ["G", "G", "G", "G", "G"],
             ["G", "G", "M", "G", "G"],
             ["G", "G", "G", "G", "G"],
             ["M", "G", "G", "G", "G"]]
+    # A musketeer victory scenario grid
+    # grid = [["-", "-", "-", "-", "M"],
+    #         ["-", "-", "-", "-", "-"],
+    #         ["-", "-", "M", "-", "-"],
+    #         ["-", "-", "-", "-", "-"],
+    #         ["M", "-", "-", "-", "-"]]
 
-    game_over = False
+    game_over = False  # Indicates if the game is over
 
-    winning_piece = "-"
+    winning_piece = "-"  # Indicates the game piece type that won
 
-    missing_piece = "-"
+    empty_piece = "-" # Empty piece value
 
-    turn_counter = 1
+    turn_counter = 1  # A turn counter for the game
 
+    #
+    # Prints the game board
+    #
     def print_board(self):
         counter = 0
         print("    1  2  3  4  5")
@@ -201,13 +232,16 @@ class Board(object):
             counter += 1
             print(" \t")
 
+    #
+    # Moves a musketeer to a requested input
+    #
     def move_musk(self, piece):
         position_of_piece = [position_dictionary[piece[0]], eval(piece[1]) - 1]
         piece = piece.lower()
         if self.grid[position_of_piece[0]][position_of_piece[1]] == "M":
             if "u" in piece and "p" in piece:
                 if position_of_piece[0] != 0 and self.grid[position_of_piece[0] - 1][position_of_piece[1]] == "G":
-                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.missing_piece
+                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.empty_piece
                     self.grid[position_of_piece[0] - 1][position_of_piece[1]] = "M"
                 else:
                     print
@@ -216,7 +250,7 @@ class Board(object):
                     return
             if "d" in piece and "o" in piece and "w" in piece and "n" in piece:
                 if position_of_piece[0] != 4 and self.grid[position_of_piece[0] + 1][position_of_piece[1]] == "G":
-                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.missing_piece
+                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.empty_piece
                     self.grid[position_of_piece[0] + 1][position_of_piece[1]] = "M"
                 else:
                     print("invalid move")
@@ -224,7 +258,7 @@ class Board(object):
                     return
             if "l" in piece and "e" in piece and "f" in piece and "t" in piece:
                 if position_of_piece[1] != 0 and self.grid[position_of_piece[0]][position_of_piece[1] - 1] == "G":
-                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.missing_piece
+                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.empty_piece
                     self.grid[position_of_piece[0]][position_of_piece[1] - 1] = "M"
                 else:
                     print("invalid move")
@@ -232,7 +266,7 @@ class Board(object):
                     return
             if "r" in piece and "i" in piece and "g" in piece and "h" in piece and "t" in piece:
                 if position_of_piece[1] != 4 and self.grid[position_of_piece[0]][position_of_piece[1] + 1] == "G":
-                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.missing_piece
+                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.empty_piece
                     self.grid[position_of_piece[0]][position_of_piece[1] + 1] = "M"
                 else:
                     print("invalid move")
@@ -242,12 +276,15 @@ class Board(object):
             print("invalid move")
             self.move_musk(input())
 
+    #
+    # Moves a musketeer to a requested input
+    #
     def move_guard(self, piece):
         position_of_piece = [position_dictionary[piece[0]], eval(piece[1]) - 1]
         if self.grid[position_of_piece[0]][position_of_piece[1]] == "G":
             if "u" in piece and "p" in piece:
                 if position_of_piece[0] != 0 and self.grid[position_of_piece[0] - 1][position_of_piece[1]] == "-":
-                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.missing_piece
+                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.empty_piece
                     self.grid[position_of_piece[0] - 1][position_of_piece[1]] = "G"
                 else:
                     print("invalid move")
@@ -255,7 +292,7 @@ class Board(object):
                     return
             if "d" in piece and "o" in piece and "w" in piece and "n" in piece:
                 if position_of_piece[0] != 4 and self.grid[position_of_piece[0] + 1][position_of_piece[1]] == "-":
-                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.missing_piece
+                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.empty_piece
                     self.grid[position_of_piece[0] + 1][position_of_piece[1]] = "G"
                 else:
                     print("invalid move")
@@ -263,7 +300,7 @@ class Board(object):
                     return
             if "l" in piece and "e" in piece and "f" in piece and "t" in piece:
                 if position_of_piece[1] != 0 and self.grid[position_of_piece[0]][position_of_piece[1] - 1] == "-":
-                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.missing_piece
+                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.empty_piece
                     self.grid[position_of_piece[0]][position_of_piece[1] - 1] = "G"
                 else:
                     print("invalid move")
@@ -271,7 +308,7 @@ class Board(object):
                     return
             if "r" in piece and "i" in piece and "g" in piece and "h" in piece and "t" in piece:
                 if position_of_piece[1] != 4 and self.grid[position_of_piece[0]][position_of_piece[1] + 1] == "-":
-                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.missing_piece
+                    self.grid[position_of_piece[0]][position_of_piece[1]] = self.empty_piece
                     self.grid[position_of_piece[0]][position_of_piece[1] + 1] = "G"
                 else:
                     print("invalid move")
@@ -281,6 +318,9 @@ class Board(object):
             print("invalid move")
             self.move_guard(input())
 
+    #
+    # Returns the button type in the give direction of the button in the given coordinates
+    #
     def check_adjacent(self, row, col, direction):
         if direction == "left":
             if col == 0:

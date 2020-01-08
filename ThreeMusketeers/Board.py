@@ -30,7 +30,7 @@ class GraphicBoard(GridLayout):
         self.moveable_to = []  # A list that holds all of the buttons that a chosen game piece can move to
         self.clicked_button = None  # A variable that holds the currently clicked button
         self.game_over_text = None  # A text that shows up when the game is over
-        self.random = "G"  # G for the guards to be the random player and M for the musketeers to be the random player
+        self.random = "-"  # G for the guards to be the random player and M for the musketeers to be the random player
 
     #
     # Creates the graphic board, adds the buttons into a matrix and if a random player is meant to be the musketeers
@@ -174,7 +174,7 @@ class Tile(ButtonBehavior, Image):
 
 
         # Highlights the buttons the game piece can move to or dehighlights the ones chosen if already clicked
-        elif not self.graphic_board.moving and not self.type == types_dictionary["empty"]:
+        elif not self.graphic_board.moving and not self.type == types_dictionary["empty"] and self.graphic_board.board.has_legal_moves(self.line, self.column):
             if (self.graphic_board.board.turn_counter % 2 == 0 and self.type == types_dictionary["guard"]) \
                     or (1 == self.graphic_board.board.turn_counter % 2 and self.type == types_dictionary["musketeer"]):
                 self.clicked = not self.clicked

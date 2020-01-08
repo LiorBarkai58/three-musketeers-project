@@ -13,7 +13,7 @@ Config.set("graphics", "height", 800)
 
 # simplifies the use of the different game pieces
 types_dictionary = {"musketeer": "M", "guard": "G", "empty": "-"}
-reverse_types_dictionary = {"M" : "musketeers", "G" : "guards"}
+reverse_types_dictionary = {"M": "musketeers", "G": "guards"}
 # connects each image to a type of game piece
 pictures_dictionary = {"M": "pics/musketeer.png", "G": "pics/guard.png", "-": "pics/empty.png"}
 
@@ -51,7 +51,8 @@ class GraphicBoard(GridLayout):
     # Creates and displays the text once the game is over
     #
     def end_game_text(self):
-        self.game_over_text = Button(text="Game over \n the %s \n have won" % reverse_types_dictionary[self.board.winning_piece])
+        self.game_over_text = Button(
+            text="Game over \n the %s \n have won" % reverse_types_dictionary[self.board.winning_piece])
         self.game_over_text.size = [600, 300]
         self.game_over_text.x = 50
         self.game_over_text.y = 350
@@ -167,7 +168,6 @@ class Tile(ButtonBehavior, Image):
             self.graphic_board.board.turn_counter += 1
             self.graphic_board.board.guard_win_check()
             self.graphic_board.board.musketeer_win_check()
-            self.graphic_board.board.print_board()
             self.graphic_board.clicked_button.clicked = False
             self.graphic_board.clicked_button = None
             self.graphic_board.moving = False
@@ -215,7 +215,7 @@ class Board(object):
 
     winning_piece = "-"  # Indicates the game piece type that won
 
-    empty_piece = "-" # Empty piece value
+    empty_piece = "-"  # Empty piece value
 
     turn_counter = 1  # A turn counter for the game
 
@@ -344,6 +344,9 @@ class Board(object):
             else:
                 return self.grid[row + 1][col]
 
+    #
+    # Checks if a given piece has any legal moves
+    #
     def has_legal_moves(self, piece_row, piece_col):
         piece = self.grid[piece_row][piece_col]
         if piece == "M":
@@ -353,6 +356,9 @@ class Board(object):
         return any(self.check_adjacent(piece_row, piece_col, direction) == desired_game_piece for direction in
                    ("up", "down", "left", "right"))
 
+    #
+    # Checks if the musketeers have won
+    #
     def musketeer_win_check(self):
         if not self.game_over:
             free_counter = 0
@@ -365,6 +371,9 @@ class Board(object):
                 self.game_over = True
                 self.winning_piece = "M"
 
+    #
+    # Checks if the guards have won
+    #
     def guard_win_check(self):
         musketeers = []
         if not self.game_over:

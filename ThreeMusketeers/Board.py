@@ -13,6 +13,7 @@ Config.set("graphics", "height", 800)
 
 types_dictionary = {"musketeer": "M", "guard": "G", "empty": "-"}
 pictures_dictionary = {"M": "pics/5head.png", "G": "pics/kekw.png", "-": "pics/kappa.png"}
+pictures_dictionary = {"M": "pics/musketeer.png", "G": "pics/guard.png", "-": "pics/empty.png"}
 
 
 class GraphicBoard(GridLayout):
@@ -105,15 +106,19 @@ class Tile(ButtonBehavior, Image):
                 if (button_direction.type == types_dictionary["guard"] and self.type == types_dictionary["musketeer"]) \
                         or (
                         button_direction.type == types_dictionary["empty"] and self.type == types_dictionary["guard"]):
-                    button_direction.color = (50, 120, 10, 5)
+                    if self.graphic_board.board.turn_counter % 2 == 1:
+                        button_direction.source = "pics/highlighted_guard.png"
+                    else:
+                        button_direction.source = "pics/highlighted_empty.png"
                     self.graphic_board.moveable_to.append(button_direction)
 
     def dehighlight_movement_options(self):
         for button in self.graphic_board.moveable_to:
-            button.color = (1, 1, 1, 1)
 
-
-
+            if self.graphic_board.board.turn_counter % 2 == 1:
+                button.source = "pics/guard.png"
+            elif not self:
+                button.source = "pics/empty.png"
 
     def on_press(self):
         if self.graphic_board.board.game_over:
@@ -127,10 +132,10 @@ class Tile(ButtonBehavior, Image):
             self.source = self.graphic_board.clicked_button.source
             self.type = self.graphic_board.clicked_button.type
             if None != self.graphic_board.clicked_button:
-                self.graphic_board.clicked_button.source = "pics/kappa.png"
+                self.graphic_board.clicked_button.source = "pics/empty.png"
                 self.graphic_board.clicked_button.type = types_dictionary["empty"]
-            for button in self.graphic_board.moveable_to:
-                button.color = (1, 1, 1, 1)
+            self.graphic_board.moveable_to.remove(self)
+            self.dehighlight_movement_options()
             self.graphic_board.moveable_to = []
             current_button = self.graphic_board.clicked_button
             if self.graphic_board.board.turn_counter % 2 != 0:

@@ -353,6 +353,32 @@ class Board(object):
                 return self.grid[row + 1][col]
 
     #
+    # Returns the button type in the give direction of the button in the given coordinates
+    #
+    def check_adjacent_coordinates(self, row, col, direction):
+        if direction == "left":
+            if col == 0:
+                return "None"
+            else:
+                return [row, col - 1]
+
+        if direction == "right":
+            if col == len(self.grid[row]) - 1:
+                return "None"
+            else:
+                return [row, col + 1]
+        if direction == "up":
+            if row == 0:
+                return "None"
+            else:
+                return [row - 1, col]
+        if direction == "down":
+            if row == len(self.grid) - 1:
+                return "None"
+            else:
+                return [row + 1, col]
+
+    #
     # Checks if a given piece has any legal moves
     #
     def has_legal_moves(self, piece_row, piece_col):

@@ -1,5 +1,7 @@
 import math
 import random as rnd
+from copy import deepcopy
+
 import kivy
 from kivy.config import Config
 from kivy.core.text import Label
@@ -196,6 +198,7 @@ class Tile(ButtonBehavior, Image):
             self.graphic_board.musketeer_random_turn()
         elif self.graphic_board.random == "G" and self.graphic_board.board.turn_counter % 2 == 0 and not self.graphic_board.moving:
             self.graphic_board.guard_random_turn()
+        
 
 
 position_dictionary = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4}
@@ -434,3 +437,29 @@ class Board(object):
                     musketeers[0][0] == musketeers[1][0] == musketeers[2][0]):
                 self.game_over = True
                 self.winning_piece = "G"
+
+    def next_moves(self, turn):
+        moves = []
+        if turn % 2 == 1:
+            for i in range(len(self.grid)):
+                for j in range(len(self.grid)):
+                    if self.grid[i][j] == "M":
+                        for possible_moves in self.legal_moves(i, j):
+                            print(possible_moves)
+                            grid_copy = Board()
+                            grid_copy.grid = deepcopy(self.grid)
+                            grid_copy.grid[i][j] = '-'
+                            grid_copy.grid[possible_moves[0]][possible_moves[1]] = 'M'
+                            moves.append(grid_copy)
+        else:
+            for i in range(len(self.grid)):
+                for j in range(len(self.grid)):
+                    if self.grid[i][j] == "G":
+                        for possible_moves in self.legal_moves(i, j):
+                            print(possible_moves)
+                            grid_copy = Board()
+                            grid_copy.grid = deepcopy(self.grid)
+                            grid_copy.grid[i][j] = '-'
+                            grid_copy.grid[possible_moves[0]][possible_moves[1]] = 'G'
+                            moves.append(grid_copy)
+        return moves

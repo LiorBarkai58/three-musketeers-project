@@ -390,6 +390,21 @@ class Board(object):
         return any(self.check_adjacent(piece_row, piece_col, direction) == desired_game_piece for direction in
                    ("up", "down", "left", "right"))
 
+    def legal_moves(self, piece_row, piece_col):
+        piece = self.grid[piece_row][piece_col]
+        if piece == "M":
+            desired_game_piece = 'G'
+        else:
+            desired_game_piece = '-'
+        moves = []
+        for direction in ("up", "down", "left", "right"):
+            adjacent_coordinates = self.check_adjacent_coordinates(piece_row, piece_col, direction)
+            if adjacent_coordinates != "None" and self.grid[adjacent_coordinates[0]][
+                adjacent_coordinates[1]] == desired_game_piece:
+                moves.append(adjacent_coordinates)
+
+        return moves
+
     #
     # Checks if the musketeers have won
     #

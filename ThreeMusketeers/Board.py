@@ -26,7 +26,8 @@ class GraphicBoard(GridLayout):
         self.cols = 5  # The size of one dimension of the board
         self.rows = self.cols
         self.graphic_representation = []  # A matrix that holds all of the buttons
-        self.moving = False  # An indication boolean which is true when buttons are highlighted and a piece is chosen and is ready to move
+        self.moving = False  # An indication boolean which is true when buttons are highlighted and a piece is chosen
+        # and is ready to move
         self.moveable_to = []  # A list that holds all of the buttons that a chosen game piece can move to
         self.clicked_button = None  # A variable that holds the currently clicked button
         self.game_over_text = None  # A text that shows up when the game is over
@@ -99,6 +100,9 @@ class GraphicBoard(GridLayout):
             self.moveable_to[index].on_press()
 
 
+#
+# The tile button represents a single button in the graphic board.
+#
 class Tile(ButtonBehavior, Image):
     def __init__(self, line, column, graphic_board, **kwargs):
         self.clicked = False  # A boolean to indicate if the button is clicked or not
@@ -174,7 +178,8 @@ class Tile(ButtonBehavior, Image):
 
 
         # Highlights the buttons the game piece can move to or dehighlights the ones chosen if already clicked
-        elif not self.graphic_board.moving and not self.type == types_dictionary["empty"] and self.graphic_board.board.has_legal_moves(self.line, self.column):
+        elif not self.graphic_board.moving and not self.type == types_dictionary[
+            "empty"] and self.graphic_board.board.has_legal_moves(self.line, self.column):
             if (self.graphic_board.board.turn_counter % 2 == 0 and self.type == types_dictionary["guard"]) \
                     or (1 == self.graphic_board.board.turn_counter % 2 and self.type == types_dictionary["musketeer"]):
                 self.clicked = not self.clicked
@@ -197,6 +202,9 @@ position_dictionary = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4}
 letter_dictionary = {0: "A", 1: "B", 2: "C", 3: "D", 4: "E"}
 
 
+#
+# The board class holds the code for the actual grid of the game, its movements and indicators
+#
 class Board(object):
     # A grid to display the board
     grid = [["G", "G", "G", "G", "M"],

@@ -33,7 +33,7 @@ class GraphicBoard(GridLayout):
         self.moveable_to = []  # A list that holds all of the buttons that a chosen game piece can move to
         self.clicked_button = None  # A variable that holds the currently clicked button
         self.game_over_text = None  # A text that shows up when the game is over
-        self.random = "-"  # G for the guards to be the random player and M for the musketeers to be the random player
+        self.random = "G"  # G for the guards to be the random player and M for the musketeers to be the random player
 
     #
     # Creates the graphic board, adds the buttons into a matrix and if a random player is meant to be the musketeers
@@ -74,6 +74,9 @@ class GraphicBoard(GridLayout):
     # Plays a random turn as the musketeers
     #
     def musketeer_random_turn(self):
+        if self.board.game_over:
+            self.end_game_text()
+            return
         row = rnd.randint(0, 4)
         col = rnd.randint(0, 4)
         while not self.board.grid[row][col] == "M" or not self.board.has_legal_moves(row, col):
@@ -84,22 +87,28 @@ class GraphicBoard(GridLayout):
             index = rnd.randint(0, len(self.moveable_to) - 1)
             self.moveable_to[index].on_press()
 
+
     #
     # Plays a random turn as the guards
     #
     def guard_random_turn(self):
-        random_row = rnd.randint(0, 4)
-        random_col = rnd.randint(0, 4)
-        while (not self.board.grid[random_row][random_col] == "G") or (
-                self.board.grid[random_row][random_col] == "G" and not self.board.has_legal_moves(random_row,
-                                                                                                  random_col)):
+        board_move = self.board.minimax(5, False)
+        print(board_move.current_move)
+        if len(board_move.current_move) > 0:
+            random_row = board_move.current_move[0][0]
+            random_col = board_move.current_move[0][1]
+        if random_row == None and random_col == None:
             random_row = rnd.randint(0, 4)
             random_col = rnd.randint(0, 4)
+            while (not self.board.grid[random_row][random_col] == "G") or (
+                    self.board.grid[random_row][random_col] == "G" and not self.board.has_legal_moves(random_row,
+                                                                                                      random_col)):
+                random_row = rnd.randint(0, 4)
+                random_col = rnd.randint(0, 4)
 
         self.graphic_representation[random_row][random_col].on_press()
-        if len(self.moveable_to) > 0:
-            index = rnd.randint(0, len(self.moveable_to) - 1)
-            self.moveable_to[index].on_press()
+        self.graphic_representation[board_move.current_move[1][0]][board_move.current_move[1][1]].on_press()
+        self.board.print_board()
 
 
 #
@@ -168,6 +177,9 @@ class Tile(ButtonBehavior, Image):
             if self.graphic_board.board.turn_counter % 2 != 0:
                 self.graphic_board.board.grid[current_button.line][current_button.column] = "-"
                 self.graphic_board.board.grid[self.line][self.column] = "M"
+                self.graphic_board.board.musketeers_locations[
+                    self.graphic_board.board.musketeers_locations.index(
+                        [current_button.line, current_button.column])] = [self.line, self.column]
             else:
                 self.graphic_board.board.grid[current_button.line][current_button.column] = "-"
                 self.graphic_board.board.grid[self.line][self.column] = "G"
@@ -198,7 +210,6 @@ class Tile(ButtonBehavior, Image):
             self.graphic_board.musketeer_random_turn()
         elif self.graphic_board.random == "G" and self.graphic_board.board.turn_counter % 2 == 0 and not self.graphic_board.moving:
             self.graphic_board.guard_random_turn()
-        
 
 
 position_dictionary = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4}
@@ -229,6 +240,10 @@ class Board(object):
     empty_piece = "-"  # Empty piece value
 
     turn_counter = 1  # A turn counter for the game
+
+    musketeers_locations = [[0, 4], [2, 2], [4, 0]]
+
+    current_move = [[None], [None]]
 
     #
     # Prints the game board
@@ -439,27 +454,81 @@ class Board(object):
                 self.winning_piece = "G"
 
     def next_moves(self, turn):
+        self.guard_win_check()
+        self.musketeer_win_check()
+        if self.game_over:
+            return self
         moves = []
         if turn % 2 == 1:
             for i in range(len(self.grid)):
                 for j in range(len(self.grid)):
                     if self.grid[i][j] == "M":
                         for possible_moves in self.legal_moves(i, j):
-                            print(possible_moves)
                             grid_copy = Board()
                             grid_copy.grid = deepcopy(self.grid)
                             grid_copy.grid[i][j] = '-'
                             grid_copy.grid[possible_moves[0]][possible_moves[1]] = 'M'
+                            grid_copy.current_move = [[i, j], [possible_moves[0], possible_moves[1]]]
                             moves.append(grid_copy)
         else:
             for i in range(len(self.grid)):
                 for j in range(len(self.grid)):
                     if self.grid[i][j] == "G":
                         for possible_moves in self.legal_moves(i, j):
-                            print(possible_moves)
                             grid_copy = Board()
                             grid_copy.grid = deepcopy(self.grid)
                             grid_copy.grid[i][j] = '-'
                             grid_copy.grid[possible_moves[0]][possible_moves[1]] = 'G'
+                            grid_copy.current_move = [[i, j], [possible_moves[0], possible_moves[1]]]
                             moves.append(grid_copy)
-        return moves
+        if len(moves) > 0:
+            return moves
+        else:
+            return None
+
+
+    # The method caters to the musketeers in this scenario and evaluates the board based on how good the move is for them
+    def evaluate_board(self, depth):
+        board_value = 0
+        self.guard_win_check()
+        self.musketeer_win_check()
+        if self.winning_piece == 'M':
+            return 10000 * depth
+        elif self.winning_piece == 'G':
+            return -10000 * depth
+        musketeers = self.musketeers_locations
+        board_value += max(abs(musketeers[0][0] - musketeers[1][0]), abs(musketeers[0][1] - musketeers[1][1])) + \
+                       max(abs(musketeers[0][0] - musketeers[2][0]), abs(musketeers[0][1] - musketeers[2][1]))
+        for i in musketeers:
+            for direction in ("up", "down", "left", "right"):
+                if self.check_adjacent(i[0], i[1], direction) == 'G':
+                    board_value -= 1 / 3 * depth
+
+        return board_value
+
+    def minimax(self, depth, is_max):
+        self.evaluate_board(depth)
+        if depth == 0 or self.game_over:
+            return self
+        best_score = self.evaluate_board(0)
+        best_move = self
+        if is_max:
+            best_score = math.inf
+        else:
+            best_score = -math.inf
+
+        possible_moves = self.next_moves(1 if is_max else 2)
+        if possible_moves is not None:
+            for move in possible_moves:
+                score = move.minimax(depth - 1, not is_max).evaluate_board(depth)
+
+                if is_max:
+                    if score < best_score:
+                        best_score = score
+                        best_move = move
+                else:
+                    if score > best_score:
+                        best_score = score
+                        best_move = move
+
+        return best_move

@@ -92,8 +92,9 @@ class GraphicBoard(GridLayout):
     # Plays a random turn as the guards
     #
     def guard_random_turn(self):
+        if self.board.game_over:
+            return
         board_move = self.board.minimax(5, False)
-        print(board_move.current_move)
         if len(board_move.current_move) > 0:
             random_row = board_move.current_move[0][0]
             random_col = board_move.current_move[0][1]
@@ -108,7 +109,6 @@ class GraphicBoard(GridLayout):
 
         self.graphic_representation[random_row][random_col].on_press()
         self.graphic_representation[board_move.current_move[1][0]][board_move.current_move[1][1]].on_press()
-        self.board.print_board()
 
 
 #
@@ -493,12 +493,12 @@ class Board(object):
         self.guard_win_check()
         self.musketeer_win_check()
         if self.winning_piece == 'M':
-            return 10000 * depth
+            return 1000000 * depth
         elif self.winning_piece == 'G':
-            return -10000 * depth
+            return -1000000 * depth
         musketeers = self.musketeers_locations
         board_value += max(abs(musketeers[0][0] - musketeers[1][0]), abs(musketeers[0][1] - musketeers[1][1])) + \
-                       max(abs(musketeers[0][0] - musketeers[2][0]), abs(musketeers[0][1] - musketeers[2][1]))
+                       max(abs(musketeers[0][0] - musketeers[2][0]), abs(musketeers[0][1] - musketeers[2][1]))*(depth+3)
         for i in musketeers:
             for direction in ("up", "down", "left", "right"):
                 if self.check_adjacent(i[0], i[1], direction) == 'G':
@@ -507,10 +507,10 @@ class Board(object):
         return board_value
 
     def minimax(self, depth, is_max):
-        self.evaluate_board(depth)
+        self.musketeer_win_check()
+        self.guard_win_check()
         if depth == 0 or self.game_over:
             return self
-        best_score = self.evaluate_board(0)
         best_move = self
         if is_max:
             best_score = math.inf
@@ -520,7 +520,7 @@ class Board(object):
         possible_moves = self.next_moves(1 if is_max else 2)
         if possible_moves is not None:
             for move in possible_moves:
-                score = move.minimax(depth - 1, not is_max).evaluate_board(depth)
+                score = move.minimax(depth - 1, not is_max) + self.evaluate_board(1)
 
                 if is_max:
                     if score < best_score:

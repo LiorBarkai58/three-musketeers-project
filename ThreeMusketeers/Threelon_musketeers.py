@@ -6,15 +6,33 @@ from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 
 from ThreeMusketeers.Board import Board, GraphicBoard
 
+# Python AI for the game "Three musketeers"
+# Note that this code runs on python 3.7 contrary to the default one at our school's labs
+#
+#
+#
+#
+#
+#
 
+#
+# Builds the first board that the player is controlling the musketeers and the AI is controlling the guardsmen
+#
 board = Board()
 graphicGridGAI = GraphicBoard(board, "G")
 graphicGridGAI.initialize_board()
 
+#
+# Builds the first board that the player is controlling the guardsmen and the AI is controlling the musketeers
+#
 board2 = Board()
 graphicGridMAI = GraphicBoard(board2, "M")
 graphicGridMAI.initialize_board()
 
+
+#
+# This is the initialization of the screen manager
+#
 Builder.load_string("""
 <Menu>:
     BoxLayout:
@@ -122,4 +140,3 @@ class TestApp(App):
 
 TestApp().run()
 
-print("The winning piece was ", board.winning_piece)

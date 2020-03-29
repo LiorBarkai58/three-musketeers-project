@@ -220,30 +220,31 @@ letter_dictionary = {0: "A", 1: "B", 2: "C", 3: "D", 4: "E"}
 # The board class holds the code for the actual grid of the game, its movements and indicators
 #
 class Board(object):
-    # A grid to display the board
-    grid = [["G", "G", "G", "G", "M"],
-            ["G", "G", "G", "G", "G"],
-            ["G", "G", "M", "G", "G"],
-            ["G", "G", "G", "G", "G"],
-            ["M", "G", "G", "G", "G"]]
-    # A musketeer victory scenario grid
-    # grid = [["G", "G", "G", "G", "M"],
-    #         ["-", "-", "-", "-", "-"],
-    #         ["M", "-", "-", "-", "-"],
-    #         ["-", "-", "-", "-", "-"],
-    #         ["M", "-", "G", "G", "G"]]
+    def __init__(self):
+        # A grid to display the board
+        self.grid = [["G", "G", "G", "G", "M"],
+                ["G", "G", "G", "G", "G"],
+                ["G", "G", "M", "G", "G"],
+                ["G", "G", "G", "G", "G"],
+                ["M", "G", "G", "G", "G"]]
+        # A musketeer victory scenario grid
+        # grid = [["G", "G", "G", "G", "M"],
+        #         ["-", "-", "-", "-", "-"],
+        #         ["M", "-", "-", "-", "-"],
+        #         ["-", "-", "-", "-", "-"],
+        #         ["M", "-", "G", "G", "G"]]
 
-    game_over = False  # Indicates if the game is over
+        self.game_over = False  # Indicates if the game is over
 
-    winning_piece = "-"  # Indicates the game piece type that won
+        self.winning_piece = "-"  # Indicates the game piece type that won
 
-    empty_piece = "-"  # Empty piece value
+        self.empty_piece = "-"  # Empty piece value
 
-    turn_counter = 1  # A turn counter for the game
+        self.turn_counter = 1  # A turn counter for the game
 
-    musketeers_locations = [[0, 4], [2, 2], [4, 0]]
+        self.musketeers_locations = [[0, 4], [2, 2], [4, 0]]
 
-    current_move = [[None], [None]]
+        self.current_move = [[None], [None]]
 
     #
     # Prints the game board

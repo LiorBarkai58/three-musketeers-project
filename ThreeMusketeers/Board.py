@@ -22,7 +22,7 @@ pictures_dictionary = {"M": "pics/musketeer.png", "G": "pics/guard.png", "-": "p
 
 # Graphic board constructor
 class GraphicBoard(GridLayout):
-    def __init__(self, board, **kwargs):
+    def __init__(self, board, randomPlayer, **kwargs):
         GridLayout.__init__(self, **kwargs)
         self.board = board  # The game board
         self.cols = 5  # The size of one dimension of the board
@@ -33,7 +33,7 @@ class GraphicBoard(GridLayout):
         self.moveable_to = []  # A list that holds all of the buttons that a chosen game piece can move to
         self.clicked_button = None  # A variable that holds the currently clicked button
         self.game_over_text = None  # A text that shows up when the game is over
-        self.random = "G"  # G for the guards to be the random player and M for the musketeers to be the random player
+        self.random = randomPlayer  # G for the guards to be the random player and M for the musketeers to be the random player
 
     #
     # Creates the graphic board, adds the buttons into a matrix and if a random player is meant to be the musketeers
@@ -227,11 +227,11 @@ class Board(object):
             ["G", "G", "G", "G", "G"],
             ["M", "G", "G", "G", "G"]]
     # A musketeer victory scenario grid
-    # grid = [["-", "-", "-", "-", "M"],
+    # grid = [["G", "G", "G", "G", "M"],
     #         ["-", "-", "-", "-", "-"],
-    #         ["-", "-", "M", "-", "-"],
+    #         ["M", "-", "-", "-", "-"],
     #         ["-", "-", "-", "-", "-"],
-    #         ["M", "-", "-", "-", "-"]]
+    #         ["M", "-", "G", "G", "G"]]
 
     game_over = False  # Indicates if the game is over
 
@@ -493,16 +493,16 @@ class Board(object):
         self.guard_win_check()
         self.musketeer_win_check()
         if self.winning_piece == 'M':
-            return 1000000 * depth
-        elif self.winning_piece == 'G':
             return -1000000 * depth
+        elif self.winning_piece == 'G':
+            return 1000000 * depth
         musketeers = self.musketeers_locations
-        board_value += max(abs(musketeers[0][0] - musketeers[1][0]), abs(musketeers[0][1] - musketeers[1][1])) + \
+        board_value -= max(abs(musketeers[0][0] - musketeers[1][0]), abs(musketeers[0][1] - musketeers[1][1])) + \
                        max(abs(musketeers[0][0] - musketeers[2][0]), abs(musketeers[0][1] - musketeers[2][1]))*(depth+3)
         for i in musketeers:
             for direction in ("up", "down", "left", "right"):
                 if self.check_adjacent(i[0], i[1], direction) == 'G':
-                    board_value -= 1 / 3 * depth
+                    board_value += 1 / 3 * depth
 
         return board_value
 
@@ -520,7 +520,7 @@ class Board(object):
         possible_moves = self.next_moves(1 if is_max else 2)
         if possible_moves is not None:
             for move in possible_moves:
-                score = move.minimax(depth - 1, not is_max) + self.evaluate_board(1)
+                score = move.minimax(depth - 1, not is_max).evaluate_board(1) + move.evaluate_board(1)
 
                 if is_max:
                     if score < best_score:

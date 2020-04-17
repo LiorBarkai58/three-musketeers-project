@@ -78,20 +78,10 @@ class GraphicBoard(GridLayout):
         if self.board.game_over:
             return
         board_move = self.board.minimax(5, True)
-        print(board_move.current_move)
-        if len(board_move.current_move) > 0:
-            random_row = board_move.current_move[0][0]
-            random_col = board_move.current_move[0][1]
-        if random_row == None and random_col == None:
-            random_row = rnd.randint(0, 4)
-            random_col = rnd.randint(0, 4)
-            while not self.board.grid[random_row][random_col] == "M" or not self.board.has_legal_moves(random_row, random_col):
-                random_row = rnd.randint(0, 4)
-                random_col = rnd.randint(0, 4)
-
+        random_row = board_move.current_move[0][0]
+        random_col = board_move.current_move[0][1]
         self.graphic_representation[random_row][random_col].on_press()
         self.graphic_representation[board_move.current_move[1][0]][board_move.current_move[1][1]].on_press()
-
 
     #
     # The AI plays a turn as the guards
@@ -100,19 +90,8 @@ class GraphicBoard(GridLayout):
         if self.board.game_over:
             return
         board_move = self.board.minimax(5, False)
-        print(board_move.current_move)
-        if len(board_move.current_move) > 0:
-            random_row = board_move.current_move[0][0]
-            random_col = board_move.current_move[0][1]
-        if random_row == None and random_col == None:
-            random_row = rnd.randint(0, 4)
-            random_col = rnd.randint(0, 4)
-            while (not self.board.grid[random_row][random_col] == "G") or (
-                    self.board.grid[random_row][random_col] == "G" and not self.board.has_legal_moves(random_row,
-                                                                                                      random_col)):
-                random_row = rnd.randint(0, 4)
-                random_col = rnd.randint(0, 4)
-
+        random_row = board_move.current_move[0][0]
+        random_col = board_move.current_move[0][1]
         self.graphic_representation[random_row][random_col].on_press()
         self.graphic_representation[board_move.current_move[1][0]][board_move.current_move[1][1]].on_press()
 
@@ -231,10 +210,10 @@ class Board(object):
     def __init__(self):
         # A grid to display the board
         self.grid = [["G", "G", "G", "G", "M"],
-                ["G", "G", "G", "G", "G"],
-                ["G", "G", "M", "G", "G"],
-                ["G", "G", "G", "G", "G"],
-                ["M", "G", "G", "G", "G"]]
+                     ["G", "G", "G", "G", "G"],
+                     ["G", "G", "M", "G", "G"],
+                     ["G", "G", "G", "G", "G"],
+                     ["M", "G", "G", "G", "G"]]
         # A musketeer victory scenario grid
         # grid = [["G", "G", "G", "G", "M"],
         #         ["-", "-", "-", "-", "-"],
@@ -479,32 +458,42 @@ class Board(object):
             return self
         moves = []
         if turn % 2 == 1:
-            for i in range(len(self.grid)):
-                for j in range(len(self.grid)):
-                    if self.grid[i][j] == "M":
-                        if self.has_legal_moves(i, j):
-                            for possible_moves in self.legal_moves(i, j):
-                                grid_copy = deepcopy(self)
-                                grid_copy.grid[i][j] = '-'
-                                grid_copy.grid[possible_moves[0]][possible_moves[1]] = 'M'
-                                grid_copy.current_move = [[i, j], [possible_moves[0], possible_moves[1]]]
-                                grid_copy.turn_counter+=1
-                                moves.append(grid_copy)
+            # for i in range(len(self.grid)):
+            #     for j in range(len(self.grid)):
+            #
+            #         if self.grid[i][j] == "M":
+            for musk in self.musketeers_locations:
+                if self.has_legal_moves(musk[0], musk[1]):
+                    for possible_moves in self.legal_moves(musk[0], musk[1]):
+                        grid_copy = deepcopy(self)
+                        grid_copy.grid[musk[0]][musk[1]] = '-'
+                        grid_copy.grid[possible_moves[0]][possible_moves[1]] = 'M'
+                        grid_copy.current_move = [[musk[0], musk[1]], [possible_moves[0], possible_moves[1]]]
+                        grid_copy.turn_counter += 1
+                        grid_copy.musketeers_locations[grid_copy.musketeers_locations.index([musk[0],musk[1]])] = [possible_moves[0], possible_moves[1]]
+                        moves.append(grid_copy)
+
+            # if self.has_legal_moves(i, j):
+            #     for possible_moves in self.legal_moves(i, j):
+            #         grid_copy = deepcopy(self)
+            #         grid_copy.grid[i][j] = '-'
+            #         grid_copy.grid[possible_moves[0]][possible_moves[1]] = 'M'
+            #         grid_copy.current_move = [[i, j], [possible_moves[0], possible_moves[1]]]
+            #         grid_copy.turn_counter+=1
+            #         moves.append(grid_copy)
         else:
             for i in range(len(self.grid)):
                 for j in range(len(self.grid)):
                     if self.grid[i][j] == "G":
                         if self.has_legal_moves(i, j):
                             for possible_moves in self.legal_moves(i, j):
-                                grid_copy = Board()
-                                grid_copy.grid = deepcopy(self.grid)
+                                grid_copy = deepcopy(self)
                                 grid_copy.grid[i][j] = '-'
                                 grid_copy.grid[possible_moves[0]][possible_moves[1]] = 'G'
                                 grid_copy.current_move = [[i, j], [possible_moves[0], possible_moves[1]]]
-                                grid_copy.turn_counter+=1
+                                grid_copy.turn_counter += 1
                                 moves.append(grid_copy)
         if len(moves) > 0:
-            print("check")
             return moves
         else:
             return None
@@ -522,14 +511,14 @@ class Board(object):
         elif self.winning_piece == 'G':
             return -1000000 * depth
         musketeers = self.musketeers_locations
-        board_value += min(abs(musketeers[0][0] - musketeers[1][0]), abs(musketeers[0][1] - musketeers[1][1])) + \
-                       min(abs(musketeers[0][0] - musketeers[2][0]), abs(musketeers[0][1] - musketeers[2][1]))
+        board_value += ((abs(musketeers[0][0] - musketeers[1][0]) + abs(musketeers[1][0] - musketeers[2][0])) + \
+                       (abs(musketeers[0][0] - musketeers[2][0]) + abs(musketeers[0][1] - musketeers[2][1])) + \
+                       (abs(musketeers[0][0] - musketeers[2][0]) + abs(musketeers[0][1] - musketeers[2][1]))) * (1/depth)
 
         for i in musketeers:
             for direction in ("up", "down", "left", "right"):
                 if self.check_adjacent(i[0], i[1], direction) == 'G':
-                    board_value -= 1 / 3 * (1/depth)
-
+                    board_value -= 1 / 2 * (1 / depth)
         return board_value
 
     def minimax(self, depth, is_max):

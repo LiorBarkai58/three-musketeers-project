@@ -469,25 +469,29 @@ class Board(object):
             for i in range(len(self.grid)):
                 for j in range(len(self.grid)):
                     if self.grid[i][j] == "M":
-                        for possible_moves in self.legal_moves(i, j):
-                            grid_copy = Board()
-                            grid_copy.grid = deepcopy(self.grid)
-                            grid_copy.grid[i][j] = '-'
-                            grid_copy.grid[possible_moves[0]][possible_moves[1]] = 'M'
-                            grid_copy.current_move = [[i, j], [possible_moves[0], possible_moves[1]]]
-                            moves.append(grid_copy)
+                        if self.has_legal_moves(i, j):
+                            for possible_moves in self.legal_moves(i, j):
+                                grid_copy = deepcopy(self)
+                                grid_copy.grid[i][j] = '-'
+                                grid_copy.grid[possible_moves[0]][possible_moves[1]] = 'M'
+                                grid_copy.current_move = [[i, j], [possible_moves[0], possible_moves[1]]]
+                                grid_copy.turn_counter+=1
+                                moves.append(grid_copy)
         else:
             for i in range(len(self.grid)):
                 for j in range(len(self.grid)):
                     if self.grid[i][j] == "G":
-                        for possible_moves in self.legal_moves(i, j):
-                            grid_copy = Board()
-                            grid_copy.grid = deepcopy(self.grid)
-                            grid_copy.grid[i][j] = '-'
-                            grid_copy.grid[possible_moves[0]][possible_moves[1]] = 'G'
-                            grid_copy.current_move = [[i, j], [possible_moves[0], possible_moves[1]]]
-                            moves.append(grid_copy)
+                        if self.has_legal_moves(i, j):
+                            for possible_moves in self.legal_moves(i, j):
+                                grid_copy = Board()
+                                grid_copy.grid = deepcopy(self.grid)
+                                grid_copy.grid[i][j] = '-'
+                                grid_copy.grid[possible_moves[0]][possible_moves[1]] = 'G'
+                                grid_copy.current_move = [[i, j], [possible_moves[0], possible_moves[1]]]
+                                grid_copy.turn_counter+=1
+                                moves.append(grid_copy)
         if len(moves) > 0:
+            print("check")
             return moves
         else:
             return None

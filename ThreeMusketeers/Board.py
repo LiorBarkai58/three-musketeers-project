@@ -36,7 +36,8 @@ class GraphicBoard(GridLayout):
         self.random = randomPlayer  # G for the guards to be the random player and M for the musketeers to be the random player
 
     #
-    # Creates the graphic board, adds the buttons into a matrix and if a random player is meant to be the musketeers
+    # Creates the graphic board, adds the buttons into a matrix
+    # if a random player is meant to be the musketeers
     # the first turn will commence
     #
     def initialize_board(self):
@@ -71,7 +72,7 @@ class GraphicBoard(GridLayout):
         self.board.musketeer_win_check()
 
     #
-    # Plays a random turn as the musketeers
+    # The AI plays as turn as the musketeers
     #
     def musketeer_random_turn(self):
         if self.board.game_over:
@@ -93,7 +94,7 @@ class GraphicBoard(GridLayout):
 
 
     #
-    # Plays a random turn as the guards
+    # The AI plays a turn as the guards
     #
     def guard_random_turn(self):
         if self.board.game_over:
@@ -168,6 +169,8 @@ class Tile(ButtonBehavior, Image):
         if self.graphic_board.moving and self == self.graphic_board.clicked_button and self.clicked:
             self.dehighlight_movement_options()
             self.graphic_board.moving = False
+
+
         # Moves the button to the chosen button if it can be moved to it
         elif self.graphic_board.moving and self in self.graphic_board.moveable_to:
             self.source = self.graphic_board.clicked_button.source
@@ -266,6 +269,7 @@ class Board(object):
 
     #
     # Moves a musketeer to a requested input
+    # Input format example: "A5 left"
     #
     def move_musk(self, piece):
         position_of_piece = [position_dictionary[piece[0]], eval(piece[1]) - 1]
@@ -310,6 +314,7 @@ class Board(object):
 
     #
     # Moves a musketeer to a requested input
+    # Input format example: "A5 left"
     #
     def move_guard(self, piece):
         position_of_piece = [position_dictionary[piece[0]], eval(piece[1]) - 1]
@@ -377,7 +382,8 @@ class Board(object):
                 return self.grid[row + 1][col]
 
     #
-    # Returns the button type in the give direction of the button in the given coordinates
+    # Returns the coordinate of the button in the give direction of the button in the given coordinates
+    # Mainly used as a supporting method for legal_moves
     #
     def check_adjacent_coordinates(self, row, col, direction):
         if direction == "left":
@@ -414,15 +420,19 @@ class Board(object):
         return any(self.check_adjacent(piece_row, piece_col, direction) == desired_game_piece for direction in
                    ("up", "down", "left", "right"))
 
+    #
+    # returns a list of the coordinates for the possible moves of a given piece
+    #
     def legal_moves(self, piece_row, piece_col):
         piece = self.grid[piece_row][piece_col]
         if piece == "M":
-            desired_game_piece = 'G'
+            desired_game_piece = "G"
         else:
-            desired_game_piece = '-'
+            desired_game_piece = "-"
         moves = []
         for direction in ("up", "down", "left", "right"):
             adjacent_coordinates = self.check_adjacent_coordinates(piece_row, piece_col, direction)
+
             if adjacent_coordinates != "None" and self.grid[adjacent_coordinates[0]][
                 adjacent_coordinates[1]] == desired_game_piece:
                 moves.append(adjacent_coordinates)
@@ -459,6 +469,9 @@ class Board(object):
                 self.game_over = True
                 self.winning_piece = "G"
 
+    #
+    # Returns a list of board with every possible move in the current turn
+    #
     def next_moves(self, turn):
         self.guard_win_check()
         self.musketeer_win_check()
@@ -496,8 +509,10 @@ class Board(object):
         else:
             return None
 
-
-    # The method caters to the musketeers in this scenario and evaluates the board based on how good the move is for them
+    #
+    # The method caters to the musketeers in this scenario
+    # Evaluates the board based on how good the move is for the musketeers
+    #
     def evaluate_board(self, depth):
         board_value = 0
         self.guard_win_check()

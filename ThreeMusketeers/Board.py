@@ -75,17 +75,21 @@ class GraphicBoard(GridLayout):
     #
     def musketeer_random_turn(self):
         if self.board.game_over:
-            self.end_game_text()
             return
-        row = rnd.randint(0, 4)
-        col = rnd.randint(0, 4)
-        while not self.board.grid[row][col] == "M" or not self.board.has_legal_moves(row, col):
-            row = rnd.randint(0, 4)
-            col = rnd.randint(0, 4)
-        self.graphic_representation[row][col].on_press()
-        if len(self.moveable_to) > 0:
-            index = rnd.randint(0, len(self.moveable_to) - 1)
-            self.moveable_to[index].on_press()
+        board_move = self.board.minimax(5, True)
+        print(board_move.current_move)
+        if len(board_move.current_move) > 0:
+            random_row = board_move.current_move[0][0]
+            random_col = board_move.current_move[0][1]
+        if random_row == None and random_col == None:
+            random_row = rnd.randint(0, 4)
+            random_col = rnd.randint(0, 4)
+            while not self.board.grid[random_row][random_col] == "M" or not self.board.has_legal_moves(random_row, random_col):
+                random_row = rnd.randint(0, 4)
+                random_col = rnd.randint(0, 4)
+
+        self.graphic_representation[random_row][random_col].on_press()
+        self.graphic_representation[board_move.current_move[1][0]][board_move.current_move[1][1]].on_press()
 
 
     #
@@ -95,6 +99,7 @@ class GraphicBoard(GridLayout):
         if self.board.game_over:
             return
         board_move = self.board.minimax(5, False)
+        print(board_move.current_move)
         if len(board_move.current_move) > 0:
             random_row = board_move.current_move[0][0]
             random_col = board_move.current_move[0][1]

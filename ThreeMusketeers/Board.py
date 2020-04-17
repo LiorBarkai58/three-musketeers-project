@@ -503,16 +503,17 @@ class Board(object):
         self.guard_win_check()
         self.musketeer_win_check()
         if self.winning_piece == 'M':
-            return -1000000 * depth
-        elif self.winning_piece == 'G':
             return 1000000 * depth
+        elif self.winning_piece == 'G':
+            return -1000000 * depth
         musketeers = self.musketeers_locations
-        board_value -= max(abs(musketeers[0][0] - musketeers[1][0]), abs(musketeers[0][1] - musketeers[1][1])) + \
-                       max(abs(musketeers[0][0] - musketeers[2][0]), abs(musketeers[0][1] - musketeers[2][1]))*(depth+3)
+        board_value += min(abs(musketeers[0][0] - musketeers[1][0]), abs(musketeers[0][1] - musketeers[1][1])) + \
+                       min(abs(musketeers[0][0] - musketeers[2][0]), abs(musketeers[0][1] - musketeers[2][1]))
+
         for i in musketeers:
             for direction in ("up", "down", "left", "right"):
                 if self.check_adjacent(i[0], i[1], direction) == 'G':
-                    board_value += 1 / 3 * depth
+                    board_value -= 1 / 3 * (1/depth)
 
         return board_value
 

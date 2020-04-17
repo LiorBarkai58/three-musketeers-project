@@ -518,28 +518,27 @@ class Board(object):
         return board_value
 
     def minimax(self, depth, is_max):
-        self.musketeer_win_check()
         self.guard_win_check()
+        self.musketeer_win_check()
         if depth == 0 or self.game_over:
             return self
         best_move = self
         if is_max:
-            best_score = math.inf
-        else:
             best_score = -math.inf
+        else:
+            best_score = math.inf
 
         possible_moves = self.next_moves(1 if is_max else 2)
         if possible_moves is not None:
             for move in possible_moves:
-                score = move.minimax(depth - 1, not is_max).evaluate_board(1) + move.evaluate_board(1)
+                score = move.minimax(depth - 1, not is_max).evaluate_board(depth) + move.evaluate_board(1)
 
                 if is_max:
-                    if score < best_score:
-                        best_score = score
-                        best_move = move
-                else:
                     if score > best_score:
                         best_score = score
                         best_move = move
-
+                else:
+                    if score < best_score:
+                        best_score = score
+                        best_move = move
         return best_move
